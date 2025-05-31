@@ -34,6 +34,7 @@ interface GeoEvent {
 export default function MapView() {
   const [fences, setFences] = useState<Fence[]>([]);
   const latest = useRef<Record<string, GeoEvent>>({});
+  const insideCount = useRef<Record<string, Set<String>>>({});
   const [, tick] = useState(0);
 
   // New: keep a history of inside/exit events for the table
@@ -60,8 +61,24 @@ export default function MapView() {
       // append to history if inside or exit
       if (ev.detect === "inside" || ev.detect === "exit") {
         setHistory((h) => [...h, ev]);
+        const occupants = insideCount.current[ev.hook] ? insideCount.current[ev.hook] : new Set();
+
+        if (ev.detect === "inside") {
+          insideCount.current = {
+            ...insideCount.current,
+            [ev.hook]: occupants.add(ev.id)
+          }}
+           else {
+            occupants.delete(ev.id)
+            insideCount.current = {
+              ...insideCount.current,
+              [ev.hook]: occupants
+            }}
+          };
+        
+
       }
-    });
+    );
     return () => {
       socket.disconnect();
     };
@@ -86,9 +103,11 @@ export default function MapView() {
           />
 
           {fences.map((f) => {
-            const anyInside = markerEntries.some(
-              (e) => e.hook === f.name && e.detect === "inside"
-            );
+            console.log(f.name + " " + insideCount.current[f.name]);
+            const anyInside = insideCount.current[f.name] ? insideCount.current[f.name].size > 0 : false;
+            // markerEntries.some(
+            //   (e) => e.hook === f.name && e.detect === "inside"
+            // );
             return (
               <Circle
                 key={f.name}
