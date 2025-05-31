@@ -76,8 +76,8 @@ export default function MapView() {
       {/* Map */}
       <div className="w-3/4">
         <MapContainer
-          center={[52.0, 4.35]}
-          zoom={13}
+          center={[51.903022, 4.481119]}
+          zoom={15}
           style={{ height: "100%" }}
         >
           <TileLayer
@@ -99,7 +99,7 @@ export default function MapView() {
                   fillOpacity: 0.2,
                 }}
               >
-                <Tooltip permanent>{f.name}</Tooltip>
+                <Tooltip>{f.name}</Tooltip>
               </Circle>
             );
           })}
